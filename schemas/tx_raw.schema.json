@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cpt:schemas:tx_raw:v0.1.0",
+  "title": "CPT Raw Transaction",
+  "type": "object",
+  "required": ["source", "chain", "wallet", "tx_hash", "timestamp_utc"],
+  "properties": {
+    "source": { "type": "string" },
+    "chain": { "type": "string" },
+    "wallet": { "type": "string" },
+    "tx_hash": { "type": "string" },
+    "timestamp_utc": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cpt:schemas:tx_normalized:v0.1.0",
+  "title": "CPT Normalized Transaction",
+  "type": "object",
+  "required": ["event_type", "chain", "wallet", "timestamp_utc"],
+  "properties": {
+    "event_type": { "type": "string" },
+    "chain": { "type": "string" },
+    "wallet": { "type": "string" },
+    "timestamp_utc": { "type": "string" }
+  },
+  "additionalProperties": true
+}

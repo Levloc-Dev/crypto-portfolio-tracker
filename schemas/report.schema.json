@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cpt:schemas:report:v0.1.0",
+  "title": "CPT Report",
+  "type": "object",
+  "required": ["report_id", "generated_at_utc", "snapshot_id"],
+  "properties": {
+    "report_id": { "type": "string" },
+    "generated_at_utc": { "type": "string" },
+    "snapshot_id": { "type": "string" }
+  },
+  "additionalProperties": true
+}

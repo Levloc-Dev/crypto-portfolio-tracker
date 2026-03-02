@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cpt:schemas:snapshot:v0.1.0",
+  "title": "CPT Snapshot",
+  "type": "object",
+  "required": ["snapshot_id", "timestamp_utc", "engine_versions", "input_hash"],
+  "properties": {
+    "snapshot_id": { "type": "string" },
+    "timestamp_utc": { "type": "string" },
+    "engine_versions": { "type": "object" },
+    "input_hash": { "type": "string" }
+  },
+  "additionalProperties": true
+}

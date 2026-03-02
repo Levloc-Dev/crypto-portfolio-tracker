@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cpt:schemas:prices:v0.1.0",
+  "title": "CPT Price Point",
+  "type": "object",
+  "required": ["asset", "timestamp_utc", "source", "price"],
+  "properties": {
+    "asset": { "type": "string" },
+    "timestamp_utc": { "type": "string" },
+    "source": { "type": "string" },
+    "price": { "type": "number" }
+  },
+  "additionalProperties": true
+}
