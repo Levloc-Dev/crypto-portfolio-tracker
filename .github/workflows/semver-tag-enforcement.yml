@@ -1,0 +1,22 @@
+name: semver-tag-enforcement
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  enforce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # required for tag + ancestry checks
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Enforce semantic version tag policy
+        run: |
+          python tools/check_semver_tag.py
