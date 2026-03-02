@@ -1,0 +1,74 @@
+name: governance-checks
+
+on:
+  pull_request:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine diff range
+        id: diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+            echo "head=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+          else
+            # push
+            echo "base=${{ github.event.before }}" >> $GITHUB_OUTPUT
+            echo "head=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Governance metadata checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${{ steps.diff.outputs.base }}"
+          HEAD="${{ steps.diff.outputs.head }}"
+          echo "[gov] diff base=$BASE head=$HEAD"
+
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD" || true)
+          echo "$CHANGED"
+
+          # 1) If any governance *.md changed, ensure they contain Version/Status/Date lines
+          GOV_CHANGED=$(echo "$CHANGED" | grep -E '^governance/.*\.md$' || true)
+          if [[ -n "$GOV_CHANGED" ]]; then
+            echo "[gov] governance files changed:"
+            echo "$GOV_CHANGED"
+            while IFS= read -r f; do
+              [[ -z "$f" ]] && continue
+              # Check required metadata fields exist somewhere in the file
+              grep -qE '^\*\*Version:\*\*|^Version:' "$f" || (echo "::error file=$f::Missing Version metadata" && exit 1)
+              grep -qE '^\*\*Status:\*\*|^Status:' "$f" || (echo "::error file=$f::Missing Status metadata" && exit 1)
+              grep -qE '^\*\*Date:\*\*|^Date:' "$f" || (echo "::error file=$f::Missing Date metadata" && exit 1)
+            done <<< "$GOV_CHANGED"
+          fi
+
+          # 2) Constitutional v1.0.0 is locked baseline: disallow edits to that specific file after initial bootstrap
+          # Allowable future changes: add new version file(s), not modify v1.0.0
+          CONST_LOCKED="governance/constitutional/CPT_Constitutional_Charter_v1.0.0.md"
+          if echo "$CHANGED" | grep -qx "$CONST_LOCKED"; then
+            echo "::error file=$CONST_LOCKED::Locked Baseline must not be modified. Create a new versioned file instead."
+            exit 1
+          fi
+
+          # 3) Optional: schema discipline hook — if schemas change, they must remain *.schema.json
+          SCHEMA_CHANGED=$(echo "$CHANGED" | grep -E '^schemas/' || true)
+          if [[ -n "$SCHEMA_CHANGED" ]]; then
+            BAD=$(echo "$SCHEMA_CHANGED" | grep -vE '\.schema\.json$|^schemas/README\.md$' || true)
+            if [[ -n "$BAD" ]]; then
+              echo "::error::Non-schema file changed under schemas/. Keep schemas as *.schema.json (plus README.md)."
+              echo "$BAD"
+              exit 1
+            fi
+          fi
+
+          echo "[gov] OK"

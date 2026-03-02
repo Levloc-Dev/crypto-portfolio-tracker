@@ -1,0 +1,17 @@
+[project]
+name = "crypto-portfolio-tracker"
+version = "0.1.0"
+description = "Governance-first, deterministic crypto portfolio tracking (CPT)"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
